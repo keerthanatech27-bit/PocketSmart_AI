@@ -1,0 +1,165 @@
+{% extends "base.html" %}
+
+{% block title %}PocketSmart AI - AI-Powered Budget Planning{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<header class="hero-header">
+  <h1 style="font-size: 3rem;">PocketSmart</h1>
+  <h2 style="font-size: 1.8rem; font-weight: 600; margin-bottom: 1rem; color: #F8FAFC;">
+    AI-Powered Budget Planning for Everyday Needs
+  </h2>
+  <p>
+    Make smarter financial decisions with personalized budget recommendations for home interiors, parties, and jewelry purchases. Our AI helps you get the most value for your money.
+  </p>
+  <div class="hero-actions">
+    <a href="/register" class="btn btn-accent" style="font-size: 1.1rem; padding: 0.9rem 2.2rem;">
+      <i class="fa-solid fa-rocket"></i> Get Started
+    </a>
+    <a href="#features" class="btn btn-outline" style="font-size: 1.1rem; padding: 0.9rem 2.2rem;">
+      Learn More
+    </a>
+  </div>
+</header>
+
+<main class="main-container">
+
+  <!-- Planners Section -->
+  <section id="features" style="text-align: center; margin-bottom: 4rem;">
+    <h2 style="font-size: 2rem; color: var(--primary-navy); margin-bottom: 0.5rem;">
+      Our Smart Budget Planners
+    </h2>
+    <div style="width: 60px; height: 4px; background: var(--accent-orange); margin: 0 auto 1.5rem auto; border-radius: 2px;"></div>
+    <p style="color: var(--text-muted); max-width: 650px; margin: 0 auto 2.5rem auto;">
+      Discover how PocketSmart helps you make better financial decisions across different areas of your life
+    </p>
+
+    <div class="planner-grid">
+      <!-- Home Planner Card -->
+      <div class="planner-card">
+        <div class="planner-card-header" style="background: linear-gradient(135deg, #1E3A8A 0%, #2563EB 100%);">
+          <i class="fa-solid fa-house"></i>
+        </div>
+        <div class="planner-card-body">
+          <div>
+            <h3>Home Interior Budget Planner</h3>
+            <p>
+              Get personalized recommendations for furniture, lighting, and decor that fit your style preferences and budget constraints. Our AI helps you create a beautiful space without overspending.
+            </p>
+          </div>
+          <a href="/home-planner" class="btn btn-primary btn-block">Get Started</a>
+        </div>
+      </div>
+
+      <!-- Party Planner Card -->
+      <div class="planner-card">
+        <div class="planner-card-header" style="background: linear-gradient(135deg, #0F766E 0%, #0D9488 100%);">
+          <i class="fa-solid fa-champagne-glasses"></i>
+        </div>
+        <div class="planner-card-body">
+          <div>
+            <h3>Party Budget Planner</h3>
+            <p>
+              Plan your perfect event with smart budget allocations for venue, catering, decorations, and entertainment. Our AI suggests the best ways to create memorable events while staying within your budget.
+            </p>
+          </div>
+          <a href="/party-planner" class="btn btn-primary btn-block">Get Started</a>
+        </div>
+      </div>
+
+      <!-- Jewelry Planner Card -->
+      <div class="planner-card">
+        <div class="planner-card-header" style="background: linear-gradient(135deg, #831843 0%, #DB2777 100%);">
+          <i class="fa-solid fa-gem"></i>
+        </div>
+        <div class="planner-card-body">
+          <div>
+            <h3>Jewelry Budget Planner</h3>
+            <p>
+              Find the ideal jewelry pieces for any occasion that match your outfit and budget. Our AI recommends options based on your style preferences, occasion, and available budget.
+            </p>
+          </div>
+          <a href="/jewelry-planner" class="btn btn-primary btn-block">Get Started</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials Section -->
+  <section id="testimonials" style="text-align: center; margin-bottom: 4rem;">
+    <h2 style="font-size: 2rem; color: var(--primary-navy); margin-bottom: 0.5rem;">
+      What Our Users Say
+    </h2>
+    <div style="width: 60px; height: 4px; background: var(--accent-orange); margin: 0 auto 1.5rem auto; border-radius: 2px;"></div>
+    <p style="color: var(--text-muted); max-width: 650px; margin: 0 auto 2.5rem auto;">
+      Real experiences from people who have transformed their financial planning with PocketSmart
+    </p>
+
+    <div class="planner-grid">
+      <!-- Testimonial 1 -->
+      <div class="card" style="text-align: left; position: relative;">
+        <i class="fa-solid fa-quote-left" style="font-size: 2rem; color: #E2E8F0; margin-bottom: 1rem;"></i>
+        <p style="color: #475569; font-style: italic; margin-bottom: 1.5rem;">
+          "PocketSmart helped me furnish my new apartment without breaking the bank. The recommendations were spot on and I saved nearly 30% of my original budget!"
+        </p>
+        <div style="display: flex; align-items: center; gap: 0.8rem;">
+          <div style="width: 45px; height: 45px; border-radius: 50%; background: #3B82F6; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+            SK
+          </div>
+          <div>
+            <h4 style="font-size: 1rem; color: var(--primary-navy);">Sarah K.</h4>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">Home Owner</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Testimonial 2 -->
+      <div class="card" style="text-align: left; position: relative;">
+        <i class="fa-solid fa-quote-left" style="font-size: 2rem; color: #E2E8F0; margin-bottom: 1rem;"></i>
+        <p style="color: #475569; font-style: italic; margin-bottom: 1.5rem;">
+          "Planning my daughter's birthday party was so much easier with PocketSmart's budget breakdown. The AI suggestions for affordable decorations and catering options were fantastic."
+        </p>
+        <div style="display: flex; align-items: center; gap: 0.8rem;">
+          <div style="width: 45px; height: 45px; border-radius: 50%; background: #10B981; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+            MR
+          </div>
+          <div>
+            <h4 style="font-size: 1rem; color: var(--primary-navy);">Michael R.</h4>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">Parent</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Testimonial 3 -->
+      <div class="card" style="text-align: left; position: relative;">
+        <i class="fa-solid fa-quote-left" style="font-size: 2rem; color: #E2E8F0; margin-bottom: 1rem;"></i>
+        <p style="color: #475569; font-style: italic; margin-bottom: 1.5rem;">
+          "The jewelry recommendations perfectly matched my outfit for the wedding. Saved me hours of searching and I received so many compliments on my accessories!"
+        </p>
+        <div style="display: flex; align-items: center; gap: 0.8rem;">
+          <div style="width: 45px; height: 45px; border-radius: 50%; background: #EC4899; color: white; display: flex; align-items: center; justify-content: center; font-weight: bold;">
+            PM
+          </div>
+          <div>
+            <h4 style="font-size: 1rem; color: var(--primary-navy);">Priya M.</h4>
+            <span style="font-size: 0.85rem; color: var(--text-muted);">Fashion Enthusiast</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Banner Section -->
+  <section style="background: var(--primary-navy); border-radius: var(--radius); padding: 3.5rem 2rem; text-align: center; color: #FFFFFF;">
+    <h2 style="font-size: 2.2rem; margin-bottom: 0.8rem;">Ready to Optimize Your Budget?</h2>
+    <p style="color: #CBD5E1; max-width: 600px; margin: 0 auto 2rem auto;">
+      Join PocketSmart today and start making smarter financial decisions across all areas of your life.
+    </p>
+    <div style="display: flex; justify-content: center; gap: 1rem;">
+      <a href="/login" class="btn btn-outline" style="min-width: 140px;">Sign In</a>
+      <a href="/register" class="btn btn-accent" style="min-width: 160px;">Create Account</a>
+    </div>
+  </section>
+
+</main>
+{% endblock %}

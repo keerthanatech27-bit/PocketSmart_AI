@@ -1,0 +1,23 @@
+{
+  "testuser_autogen": {
+    "username": "testuser_autogen",
+    "email": "testuser@example.com",
+    "full_name": "Test User",
+    "hashed_password": "b926e929192ee30e047ab90fc9d1e0d811a4ccc5f0411da2047abfccc8cd8f60",
+    "disabled": false
+  },
+  "Keerthana S": {
+    "username": "Keerthana S",
+    "email": "ak27keerthana@gmail.com",
+    "full_name": "Keerthana S",
+    "hashed_password": "1e1e8f4b841bd5c882298bcf7793384bc998f695f73d1b392968d7d23caf5809",
+    "disabled": false
+  },
+  "sham": {
+    "username": "sham",
+    "email": "ak27keerthana@gmail.com",
+    "full_name": "sham",
+    "hashed_password": "1e1e8f4b841bd5c882298bcf7793384bc998f695f73d1b392968d7d23caf5809",
+    "disabled": false
+  }
+}

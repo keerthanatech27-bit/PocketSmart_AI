@@ -1,0 +1,242 @@
+{% extends "base.html" %}
+
+{% block title %}Recommendation History - PocketSmart AI{% endblock %}
+
+{% block content %}
+<header class="hero-header">
+  <h1 style="font-size: 2.3rem;">Your Recommendation History</h1>
+  <p>View and manage all your previous budget plans and recommendations</p>
+</header>
+
+<main class="main-container">
+  
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h2 style="font-size: 1.6rem; color: var(--primary-navy); display: flex; align-items: center; gap: 0.6rem;">
+      <i class="fa-solid fa-clock-rotate-left" style="color: var(--primary-blue);"></i> Recent Recommendations
+    </h2>
+    <a href="/dashboard" class="btn btn-primary" style="padding: 0.5rem 1.2rem; font-size: 0.9rem;">
+      <i class="fa-solid fa-gauge"></i> Back to Dashboard
+    </a>
+  </div>
+
+  <div id="historyGrid" class="history-grid">
+    <!-- Loaded dynamically -->
+  </div>
+
+  <div id="emptyHistory" style="display:none; text-align: center; padding: 4rem 2rem;" class="card">
+    <i class="fa-solid fa-folder-open" style="font-size: 3.5rem; color: #CBD5E1; margin-bottom: 1rem;"></i>
+    <h3 style="color: var(--primary-navy); margin-bottom: 0.5rem;">No History Found</h3>
+    <p style="color: var(--text-muted); margin-bottom: 1.5rem;">You haven't generated any budget recommendations yet.</p>
+    <a href="/home-planner" class="btn btn-primary">Start with Home Planner</a>
+  </div>
+
+  <!-- Detail View Modal -->
+  <div id="detailModal" class="modal">
+    <div class="modal-content">
+      <span class="modal-close" onclick="closeModal()">&times;</span>
+      <h3 id="modalTitle" style="color: var(--primary-navy); font-size: 1.5rem; margin-bottom: 0.5rem;">Recommendation Details</h3>
+      <p id="modalTimestamp" style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;"></p>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', fetchHistory);
+
+async function fetchHistory() {
+  showSpinner('Loading history...');
+  try {
+    const res = await fetch('/recommendation-history');
+    if (res.status === 401) {
+      hideSpinner();
+      window.location.href = '/login';
+      return;
+    }
+    const data = await res.json();
+    hideSpinner();
+    renderHistory(data.history || []);
+  } catch (err) {
+    hideSpinner();
+    alert('Error loading history: ' + err.message);
+  }
+}
+
+function renderHistory(items) {
+  const grid = document.getElementById('historyGrid');
+  const empty = document.getElementById('emptyHistory');
+
+  if (items.length === 0) {
+    grid.style.display = 'none';
+    empty.style.display = 'block';
+    return;
+  }
+
+  grid.style.display = 'grid';
+  empty.style.display = 'none';
+  grid.innerHTML = '';
+
+  items.forEach(item => {
+    const card = document.createElement('div');
+    card.className = 'history-card';
+
+    let icon = 'fa-layer-group';
+    let color = '#2563EB';
+    let typeName = 'Budget Plan';
+
+    if (item.type === 'home') {
+      icon = 'fa-house';
+      color = '#10B981';
+      typeName = 'Home Interior Budget';
+    } else if (item.type === 'party') {
+      icon = 'fa-champagne-glasses';
+      color = '#F59E0B';
+      typeName = 'Party Planning Budget';
+    } else if (item.type === 'jewelry') {
+      icon = 'fa-gem';
+      color = '#EC4899';
+      typeName = 'Jewelry Budget';
+    }
+
+    const total = item.full_result.total_budget || item.input.budget || 0;
+    const remaining = item.full_result.remaining_budget || item.summary.remaining_budget || 0;
+
+    let detailsHtml = '';
+    if (item.type === 'home') {
+      const d = item.input.details || {};
+      detailsHtml = `
+        <div style="font-size: 0.9rem; color: var(--text-dark); margin: 0.8rem 0;">
+          <p><strong>Lights:</strong> ${d.num_lights || 0} • <strong>Fans:</strong> ${d.num_fans || 0} • <strong>Furniture:</strong> ${d.num_furniture || 0}</p>
+        </div>
+      `;
+    } else if (item.type === 'party') {
+      const d = item.input.details || {};
+      detailsHtml = `
+        <div style="font-size: 0.9rem; color: var(--text-dark); margin: 0.8rem 0;">
+          <p><strong>Type:</strong> ${d.party_type || 'Party'} • <strong>Guests:</strong> ${d.num_guests || 1}</p>
+        </div>
+      `;
+    } else if (item.type === 'jewelry') {
+      const d = item.input.details || {};
+      detailsHtml = `
+        <div style="font-size: 0.9rem; color: var(--text-dark); margin: 0.8rem 0;">
+          <p><strong>Occasion:</strong> ${d.occasion || 'General'} ${d.image ? '• <em>With Outfit Image</em>' : ''}</p>
+        </div>
+      `;
+    }
+
+    card.innerHTML = `
+      <div>
+        <div class="history-card-header">
+          <div style="display:flex; align-items:center; gap:0.5rem; font-weight:700; color:var(--primary-navy);">
+            <i class="fa-solid ${icon}" style="color:${color};"></i> ${typeName}
+          </div>
+          <span style="font-size:0.8rem; color:var(--text-muted);">${item.timestamp}</span>
+        </div>
+
+        <div style="display:flex; justify-content:space-between; align-items:center; margin:1rem 0; padding: 0.8rem; background:#F8FAFC; border-radius:8px;">
+          <div>
+            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Total Budget</div>
+            <div style="font-size:1.1rem; font-weight:700; color:var(--primary-navy);">₹${parseFloat(total).toFixed(2)}</div>
+          </div>
+          <div>
+            <div style="font-size:0.75rem; color:var(--text-muted); text-transform:uppercase;">Remaining</div>
+            <div style="font-size:1.1rem; font-weight:700; color:#10B981;">₹${parseFloat(remaining).toFixed(2)}</div>
+          </div>
+        </div>
+
+        ${detailsHtml}
+      </div>
+
+      <button onclick="viewDetails('${item.id}')" class="btn btn-primary btn-block" style="padding:0.6rem; font-size:0.9rem; margin-top:1rem; background-color: #2563EB;">
+        <i class="fa-solid fa-eye"></i> View Full Details
+      </button>
+    `;
+
+    grid.appendChild(card);
+  });
+}
+
+async function viewDetails(recId) {
+  showSpinner('Fetching details...');
+  try {
+    const res = await fetch(`/recommendation-details/${recId}`);
+    const data = await res.json();
+    hideSpinner();
+
+    document.getElementById('modalTitle').innerText = `${data.type.toUpperCase()} Budget Recommendation Details`;
+    document.getElementById('modalTimestamp').innerText = `Created on: ${data.timestamp}`;
+
+    const modalBody = document.getElementById('modalBody');
+    modalBody.innerHTML = '';
+
+    const resObj = data.full_result;
+    let html = `
+      <div style="background:#EFF6FF; padding:1rem; border-radius:8px; margin-bottom:1.5rem; display:flex; justify-content:space-between;">
+        <div><strong>Total Budget:</strong> ₹${parseFloat(resObj.total_budget || 0).toFixed(2)}</div>
+        <div><strong>Remaining Budget:</strong> ₹${parseFloat(resObj.remaining_budget || 0).toFixed(2)}</div>
+      </div>
+    `;
+
+    if (resObj.budget_breakdown) {
+      resObj.budget_breakdown.forEach(cat => {
+        html += `<h4 style="color:var(--primary-navy); margin:1rem 0 0.5rem 0; text-transform:capitalize;">${cat.category.replace('_', ' ')} (Allocation: ₹${cat.allocation})</h4>`;
+        html += `<ul style="list-style:none; padding-left:0; margin-bottom:1rem;">`;
+        (cat.items || []).forEach(item => {
+          let links = '';
+          if (item.shopping_links) {
+            for (const [p, link] of Object.entries(item.shopping_links)) {
+              links += `<a href="${link}" target="_blank" class="shop-btn ${p}" style="font-size:0.75rem;">${p.toUpperCase()}</a> `;
+            }
+          }
+          html += `
+            <li style="padding:0.8rem; border:1px solid #E2E8F0; border-radius:6px; margin-bottom:0.5rem; background:#FFFFFF;">
+              <div style="display:flex; justify-content:space-between;">
+                <strong>${item.name}</strong>
+                <span style="font-weight:bold; color:var(--primary-navy);">₹${item.estimated_price}</span>
+              </div>
+              <p style="font-size:0.85rem; color:var(--text-muted); margin:0.3rem 0;">${item.description || ''}</p>
+              <div style="margin-top:0.4rem;">${links}</div>
+            </li>
+          `;
+        });
+        html += `</ul>`;
+      });
+    } else if (resObj.jewelry_recommendations) {
+      html += `<h4 style="color:var(--primary-navy); margin-bottom:0.8rem;">Recommended Pieces:</h4>`;
+      resObj.jewelry_recommendations.forEach(item => {
+        let links = '';
+        if (item.shopping_links) {
+          for (const [p, link] of Object.entries(item.shopping_links)) {
+            links += `<a href="${link}" target="_blank" class="shop-btn ${p}" style="font-size:0.75rem;">${p.toUpperCase()}</a> `;
+          }
+        }
+        html += `
+          <div style="padding:0.8rem; border:1px solid #E2E8F0; border-radius:6px; margin-bottom:0.6rem; background:#FFFFFF;">
+            <div style="display:flex; justify-content:space-between;">
+              <strong>${item.item_type}</strong>
+              <span style="font-weight:bold; color:#2563EB;">₹${item.estimated_price}</span>
+            </div>
+            <p style="font-size:0.85rem; color:var(--text-muted); margin:0.3rem 0;">${item.description || ''}</p>
+            <div style="margin-top:0.4rem;">${links}</div>
+          </div>
+        `;
+      });
+    }
+
+    modalBody.innerHTML = html;
+    document.getElementById('detailModal').style.display = 'flex';
+  } catch (err) {
+    hideSpinner();
+    alert('Failed to load details: ' + err.message);
+  }
+}
+
+function closeModal() {
+  document.getElementById('detailModal').style.display = 'none';
+}
+</script>
+{% endblock %}

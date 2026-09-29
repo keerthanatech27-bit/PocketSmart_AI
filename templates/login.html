@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Sign In - PocketSmart AI{% endblock %}
+
+{% block content %}
+<main class="main-container">
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1 style="color: var(--primary-navy); font-size: 2.2rem; font-weight: 800;">
+          <i class="fa-solid fa-wallet" style="color: #F37021;"></i> PocketSmart
+        </h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.2rem;">AI-Powered Budget Planning</p>
+        <h2 style="font-size: 1.4rem; color: var(--primary-navy); margin-top: 1.5rem;">Welcome Back</h2>
+      </div>
+
+      <div id="alertBox" style="display:none; padding: 0.8rem; border-radius: 6px; margin-bottom: 1.2rem; font-size: 0.9rem; text-align: left;"></div>
+
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group" style="text-align: left;">
+          <label class="form-label" for="username">Username</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-user"></i>
+            <input type="text" id="username" name="username" class="form-control" placeholder="Enter your username" required>
+          </div>
+        </div>
+
+        <div class="form-group" style="text-align: left;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <label class="form-label" for="password" style="margin-bottom:0;">Password</label>
+            <a href="#" style="font-size: 0.8rem; color: var(--primary-blue); text-decoration: none;">Forgot Password?</a>
+          </div>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="password" name="password" class="form-control" placeholder="Enter your password" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="padding: 0.9rem; font-size: 1.05rem; margin-top: 1.2rem;">
+          Sign In <i class="fa-solid fa-arrow-right" style="margin-left: 0.3rem;"></i>
+        </button>
+
+        <p style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+          Don't have an account? <a href="/register" style="color: var(--primary-blue); font-weight: 600; text-decoration: none;">Create Account</a>
+        </p>
+      </form>
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function handleLogin(e) {
+  e.preventDefault();
+  const alertBox = document.getElementById('alertBox');
+  alertBox.style.display = 'none';
+
+  const username = document.getElementById('username').value.trim();
+  const password = document.getElementById('password').value;
+
+  showSpinner('Authenticating...');
+
+  try {
+    const res = await fetch('/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+    hideSpinner();
+
+    if (res.ok) {
+      alertBox.style.display = 'block';
+      alertBox.style.backgroundColor = '#DEF7EC';
+      alertBox.style.color = '#03543F';
+      alertBox.innerText = 'Login successful! Redirecting...';
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 500);
+    } else {
+      alertBox.style.display = 'block';
+      alertBox.style.backgroundColor = '#FEE2E2';
+      alertBox.style.color = '#B91C1C';
+      alertBox.innerText = data.detail || 'Invalid username or password.';
+    }
+  } catch (err) {
+    hideSpinner();
+    alertBox.style.display = 'block';
+    alertBox.style.backgroundColor = '#FEE2E2';
+    alertBox.style.color = '#B91C1C';
+    alertBox.innerText = 'Login error: ' + err.message;
+  }
+}
+</script>
+{% endblock %}

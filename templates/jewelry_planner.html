@@ -1,0 +1,277 @@
+{% extends "base.html" %}
+
+{% block title %}Jewelry Budget Planner - PocketSmart AI{% endblock %}
+
+{% block content %}
+<header class="hero-header">
+  <h1 style="font-size: 2.3rem;">Jewelry Budget Planner</h1>
+  <p>Get AI-powered jewelry recommendations within your budget for any occasion</p>
+</header>
+
+<main class="main-container">
+  <div class="planner-container">
+    
+    <!-- Planner Input Card -->
+    <div class="card" id="jewelryPlannerCard">
+      <form id="jewelryPlannerForm" onsubmit="generateJewelryPlan(event)">
+        
+        <!-- Budget Details Section -->
+        <div class="section-title">
+          <i class="fa-solid fa-dollar-sign"></i> Budget Details
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="total_budget">Total Budget (₹)</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-money-bill-wave"></i>
+            <input type="number" id="total_budget" name="total_budget" class="form-control" placeholder="e.g. 5000" min="200" required value="5000">
+          </div>
+        </div>
+
+        <!-- Occasion & Preferences Section -->
+        <div class="section-title" style="margin-top: 2rem;">
+          <i class="fa-solid fa-calendar-days"></i> Occasion & Preferences
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="occasion"><i class="fa-solid fa-champagne-glasses"></i> Occasion</label>
+          <input type="text" id="occasion" name="occasion" class="form-control" placeholder="e.g. Birthday, Wedding, Casual, Anniversary" value="Birthday" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="preferences"><i class="fa-solid fa-heart"></i> Style Preferences</label>
+          <textarea id="preferences" name="preferences" class="form-control" rows="3" placeholder="Describe your style preferences, materials, colors, etc."></textarea>
+        </div>
+
+        <!-- Upload Outfit Image Section -->
+        <div class="section-title" style="margin-top: 2rem;">
+          <i class="fa-solid fa-shirt"></i> Upload Outfit Image
+        </div>
+        <div class="upload-dropzone" id="dropzone" onclick="document.getElementById('outfit_image').click()">
+          <input type="file" id="outfit_image" name="image" accept="image/*" style="display: none;" onchange="handleImageSelect(event)">
+          <div id="dropzoneContent">
+            <i class="fa-solid fa-cloud-arrow-up" style="font-size: 2.5rem; color: var(--primary-blue); margin-bottom: 0.8rem;"></i>
+            <p style="font-weight: 600; color: var(--primary-navy);">Click or drag & drop outfit photo here</p>
+            <p style="font-size: 0.85rem; color: var(--text-muted); margin-top: 0.3rem;">Supports JPG, PNG, WEBP (Optional)</p>
+          </div>
+          <img id="imagePreview" class="upload-preview" alt="Outfit preview">
+        </div>
+        <div id="removeImageBtn" style="display:none; text-align:right; margin-top:0.5rem;">
+          <button type="button" onclick="removeSelectedImage()" class="btn" style="background:#EF4444; color:white; padding:0.3rem 0.8rem; font-size:0.85rem;">
+            <i class="fa-solid fa-trash"></i> Remove Image
+          </button>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="padding: 1rem; font-size: 1.1rem; margin-top: 2rem;">
+          <i class="fa-solid fa-wand-magic-sparkles"></i> Get Recommendations
+        </button>
+      </form>
+    </div>
+
+    <!-- Results Section -->
+    <div id="resultsContainer" class="results-container">
+      <div style="text-align: center; margin-bottom: 2rem;">
+        <h2 style="font-size: 2rem; color: var(--primary-navy);">Your Personalized Jewelry Recommendations</h2>
+      </div>
+
+      <!-- Budget Summary Banner -->
+      <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 1.5rem;">
+        <div class="results-header-banner">
+          <div style="display: flex; align-items: center; gap: 0.6rem; font-size: 1.2rem;">
+            <i class="fa-solid fa-chart-pie"></i> Budget Summary
+          </div>
+          <div style="display: flex; gap: 2rem; font-size: 1.05rem;">
+            <div>Total Budget: <span id="resTotalBudget" style="color: #93C5FD;">₹0.00</span></div>
+            <div>Remaining Budget: <span id="resRemainingBudget" class="badge-budget">₹0.00</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Outfit Analysis Card -->
+      <div class="card" id="outfitAnalysisCard" style="display: none; padding: 1.5rem; margin-bottom: 1.5rem; background: #F8FAFC;">
+        <h4 style="font-size: 1.1rem; color: var(--primary-navy); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fa-solid fa-shirt" style="color: #2563EB;"></i> Outfit Analysis
+        </h4>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap;" id="outfitPills"></div>
+      </div>
+
+      <!-- Jewelry Items Card -->
+      <div class="card" style="padding: 0; overflow: hidden; margin-bottom: 1.5rem;">
+        <div style="background: var(--primary-navy); color: #FFFFFF; padding: 1rem 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fa-solid fa-gem"></i> Jewelry Recommendations
+        </div>
+        <div id="jewelryItemsList" style="padding: 0;"></div>
+      </div>
+
+      <!-- Styling Tips Card -->
+      <div class="card" style="padding: 0; overflow: hidden;">
+        <div style="background: #2563EB; color: #FFFFFF; padding: 1rem 1.5rem; font-weight: 700; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="fa-solid fa-lightbulb"></i> Styling Tips
+        </div>
+        <div style="padding: 1.5rem;">
+          <ul id="jewelryTipsList" style="list-style: none; display: flex; flex-direction: column; gap: 0.8rem;"></ul>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+let selectedFile = null;
+
+function handleImageSelect(e) {
+  const file = e.target.files[0];
+  if (file) {
+    selectedFile = file;
+    const reader = new FileReader();
+    reader.onload = function(evt) {
+      const preview = document.getElementById('imagePreview');
+      preview.src = evt.target.result;
+      preview.style.display = 'inline-block';
+      document.getElementById('dropzoneContent').style.display = 'none';
+      document.getElementById('removeImageBtn').style.display = 'block';
+    };
+    reader.readAsDataURL(file);
+  }
+}
+
+function removeSelectedImage() {
+  selectedFile = null;
+  document.getElementById('outfit_image').value = '';
+  document.getElementById('imagePreview').style.display = 'none';
+  document.getElementById('dropzoneContent').style.display = 'block';
+  document.getElementById('removeImageBtn').style.display = 'none';
+}
+
+async function generateJewelryPlan(e) {
+  e.preventDefault();
+
+  const total_budget = document.getElementById('total_budget').value;
+  const occasion = document.getElementById('occasion').value;
+  const preferences = document.getElementById('preferences').value;
+
+  const formData = new FormData();
+  formData.append('total_budget', total_budget);
+  formData.append('occasion', occasion);
+  formData.append('preferences', preferences);
+  if (selectedFile) {
+    formData.append('image', selectedFile);
+  }
+
+  showSpinner('AI Vision is analyzing outfit aesthetics & finding matching jewelry...');
+
+  try {
+    const res = await fetch('/jewelry-budget', {
+      method: 'POST',
+      body: formData
+    });
+
+    if (res.status === 401) {
+      hideSpinner();
+      alert('Please log in first to generate and save recommendations.');
+      window.location.href = '/login';
+      return;
+    }
+
+    const data = await res.json();
+    hideSpinner();
+
+    if (res.ok) {
+      renderJewelryResults(data);
+    } else {
+      alert('Error: ' + (data.detail || 'Could not generate jewelry recommendations.'));
+    }
+  } catch (err) {
+    hideSpinner();
+    alert('Failed to connect to server: ' + err.message);
+  }
+}
+
+function renderJewelryResults(data) {
+  const container = document.getElementById('resultsContainer');
+  container.style.display = 'block';
+
+  document.getElementById('resTotalBudget').innerText = '₹' + parseFloat(data.total_budget || 0).toFixed(2);
+  document.getElementById('resRemainingBudget').innerText = '₹' + parseFloat(data.remaining_budget || 0).toFixed(2);
+
+  // Outfit Analysis
+  const analysisCard = document.getElementById('outfitAnalysisCard');
+  const pillsContainer = document.getElementById('outfitPills');
+  pillsContainer.innerHTML = '';
+  if (data.outfit_analysis) {
+    analysisCard.style.display = 'block';
+    const analysis = data.outfit_analysis;
+    const colors = Array.isArray(analysis.colors) ? analysis.colors.join(', ') : analysis.colors;
+    
+    pillsContainer.innerHTML = `
+      <div style="background:#EFF6FF; border:1px solid #BFDBFE; padding:0.5rem 1rem; border-radius:8px; font-size:0.9rem;">
+        <i class="fa-solid fa-palette" style="color:#2563EB;"></i> <strong>Colors:</strong> ${colors || 'Neutral'}
+      </div>
+      <div style="background:#F0FDF4; border:1px solid #BBF7D0; padding:0.5rem 1rem; border-radius:8px; font-size:0.9rem;">
+        <i class="fa-solid fa-wand-magic" style="color:#16A34A;"></i> <strong>Style:</strong> ${analysis.style || 'Modern'}
+      </div>
+      <div style="background:#FDF2F8; border:1px solid #FBCFE8; padding:0.5rem 1rem; border-radius:8px; font-size:0.9rem;">
+        <i class="fa-solid fa-crown" style="color:#DB2777;"></i> <strong>Formality:</strong> ${analysis.formality || 'Smart Casual'}
+      </div>
+    `;
+  } else {
+    analysisCard.style.display = 'none';
+  }
+
+  // Jewelry Items
+  const itemsContainer = document.getElementById('jewelryItemsList');
+  itemsContainer.innerHTML = '';
+
+  const recs = data.jewelry_recommendations || [];
+  recs.forEach(item => {
+    let shopLinksHtml = '';
+    if (item.shopping_links) {
+      for (const [platform, link] of Object.entries(item.shopping_links)) {
+        shopLinksHtml += `<a href="${link}" target="_blank" class="shop-btn ${platform}"><i class="fa-solid fa-arrow-up-right-from-square"></i> ${platform.toUpperCase()}</a> `;
+      }
+    }
+
+    const row = document.createElement('div');
+    row.style.padding = '1.2rem 1.5rem';
+    row.style.borderBottom = '1px solid var(--border-color)';
+    row.style.display = 'flex';
+    row.style.justifyContent = 'space-between';
+    row.style.alignItems = 'flex-start';
+
+    row.innerHTML = `
+      <div>
+        <h5 style="font-size: 1.1rem; color: var(--primary-navy); margin-bottom: 0.3rem; display: flex; align-items: center; gap: 0.5rem;">
+          <span style="width: 10px; height: 10px; border-radius: 50%; background: #2563EB; display: inline-block;"></span>
+          ${item.item_type}
+        </h5>
+        <p style="font-size: 0.9rem; color: var(--text-muted); margin-bottom: 0.4rem;">${item.description || ''}</p>
+        <p style="font-size: 0.85rem; color: #475569; margin-bottom: 0.6rem;"><strong>Style:</strong> ${item.style || 'Classic'}</p>
+        <div style="font-size: 0.85rem; display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
+          <i class="fa-solid fa-cart-shopping" style="color: var(--primary-blue);"></i> <strong>Shop For This:</strong> ${shopLinksHtml}
+        </div>
+      </div>
+      <div style="font-size: 1.15rem; font-weight: 700; color: #2563EB; background: #EFF6FF; padding: 0.4rem 0.8rem; border-radius: 6px; white-space: nowrap; margin-left: 1rem;">
+        ₹${parseFloat(item.estimated_price || 0).toFixed(2)}
+      </div>
+    `;
+    itemsContainer.appendChild(row);
+  });
+
+  // Styling Tips
+  const tipsList = document.getElementById('jewelryTipsList');
+  tipsList.innerHTML = '';
+  (data.styling_tips || []).forEach(tip => {
+    const li = document.createElement('li');
+    li.style.display = 'flex';
+    li.style.alignItems = 'flex-start';
+    li.style.gap = '0.6rem';
+    li.style.color = '#334155';
+    li.innerHTML = `<i class="fa-solid fa-circle-check" style="color: #10B981; margin-top: 0.3rem;"></i> <span>${tip}</span>`;
+    tipsList.appendChild(li);
+  });
+
+  container.scrollIntoView({ behavior: 'smooth' });
+}
+</script>
+{% endblock %}
