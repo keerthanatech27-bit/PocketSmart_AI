@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+
+{% block title %}Create Your Account - PocketSmart AI{% endblock %}
+
+{% block content %}
+<main class="main-container">
+  <div class="auth-wrapper">
+    <div class="auth-card">
+      <div class="auth-header">
+        <h1 style="color: var(--primary-navy); font-size: 2.2rem; font-weight: 800;">
+          <i class="fa-solid fa-wallet" style="color: #F37021;"></i> PocketSmart
+        </h1>
+        <p style="color: var(--text-muted); font-size: 0.95rem; margin-top: 0.2rem;">AI-Powered Budget Planning</p>
+        <h2 style="font-size: 1.4rem; color: var(--primary-navy); margin-top: 1.5rem;">Create Your Account</h2>
+      </div>
+
+      <div id="alertBox" style="display:none; padding: 0.8rem; border-radius: 6px; margin-bottom: 1.2rem; font-size: 0.9rem; text-align: left;"></div>
+
+      <form id="registerForm" onsubmit="handleRegister(event)">
+        <div class="form-group" style="text-align: left;">
+          <label class="form-label" for="username">Username</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-user"></i>
+            <input type="text" id="username" name="username" class="form-control" placeholder="Choose a username" required>
+          </div>
+        </div>
+
+        <div class="form-group" style="text-align: left;">
+          <label class="form-label" for="email">Email</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-envelope"></i>
+            <input type="email" id="email" name="email" class="form-control" placeholder="Enter your email" required>
+          </div>
+        </div>
+
+        <div class="form-group" style="text-align: left;">
+          <label class="form-label" for="password">Password</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="password" name="password" class="form-control" placeholder="Create a strong password" required>
+          </div>
+        </div>
+
+        <div class="form-group" style="text-align: left;">
+          <label class="form-label" for="confirm_password">Confirm Password</label>
+          <div class="input-with-icon">
+            <i class="fa-solid fa-circle-check"></i>
+            <input type="password" id="confirm_password" name="confirm_password" class="form-control" placeholder="Confirm your password" required>
+          </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-block" style="padding: 0.9rem; font-size: 1.05rem; margin-top: 1rem;">
+          Create Account <i class="fa-solid fa-user-plus" style="margin-left: 0.3rem;"></i>
+        </button>
+
+        <p style="margin-top: 1.5rem; font-size: 0.9rem; color: var(--text-muted);">
+          Already have an account? <a href="/login" style="color: var(--primary-blue); font-weight: 600; text-decoration: none;">Sign In</a>
+        </p>
+      </form>
+    </div>
+  </div>
+</main>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function handleRegister(e) {
+  e.preventDefault();
+  const alertBox = document.getElementById('alertBox');
+  alertBox.style.display = 'none';
+
+  const username = document.getElementById('username').value.trim();
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  const confirmPassword = document.getElementById('confirm_password').value;
+
+  if (password !== confirmPassword) {
+    alertBox.style.display = 'block';
+    alertBox.style.backgroundColor = '#FEE2E2';
+    alertBox.style.color = '#B91C1C';
+    alertBox.innerText = 'Passwords do not match!';
+    return;
+  }
+
+  showSpinner('Registering your account...');
+
+  try {
+    const res = await fetch('/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, email, password, full_name: username })
+    });
+
+    const data = await res.json();
+    hideSpinner();
+
+    if (res.ok) {
+      alertBox.style.display = 'block';
+      alertBox.style.backgroundColor = '#DEF7EC';
+      alertBox.style.color = '#03543F';
+      alertBox.innerText = 'Account created successfully! Redirecting...';
+      setTimeout(() => {
+        window.location.href = '/dashboard';
+      }, 800);
+    } else {
+      alertBox.style.display = 'block';
+      alertBox.style.backgroundColor = '#FEE2E2';
+      alertBox.style.color = '#B91C1C';
+      alertBox.innerText = data.detail || 'Registration failed.';
+    }
+  } catch (err) {
+    hideSpinner();
+    alertBox.style.display = 'block';
+    alertBox.style.backgroundColor = '#FEE2E2';
+    alertBox.style.color = '#B91C1C';
+    alertBox.innerText = 'An error occurred: ' + err.message;
+  }
+}
+</script>
+{% endblock %}
