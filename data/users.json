@@ -19,5 +19,12 @@
     "full_name": "sham",
     "hashed_password": "1e1e8f4b841bd5c882298bcf7793384bc998f695f73d1b392968d7d23caf5809",
     "disabled": false
+  },
+  "doremon": {
+    "username": "doremon",
+    "email": "ak27keerthana@gmail.com",
+    "full_name": "doremon",
+    "hashed_password": "1e1e8f4b841bd5c882298bcf7793384bc998f695f73d1b392968d7d23caf5809",
+    "disabled": false
   }
 }
